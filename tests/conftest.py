@@ -1,5 +1,7 @@
 import base64
 import os
+import platform
+from importlib import import_module
 from tempfile import mkstemp
 from unittest.mock import patch
 
@@ -61,7 +63,12 @@ if DBTYPE == "sqlite":
                 pass
 
 elif DBTYPE in ("mysql", "mariadb"):
-    import MySQLdb
+    if platform.python_implementation() == "PyPy":
+        mysql_dbapi = import_module("pymysql")
+        mysql_driver = "pymysql"
+    else:
+        mysql_dbapi = import_module("MySQLdb")
+        mysql_driver = "mysqldb"
 
     @pytest.fixture(scope="session")
     def dbconn():
@@ -70,11 +77,9 @@ elif DBTYPE in ("mysql", "mariadb"):
             port = 3306
         elif DBTYPE == "mariadb":
             port = 3307
-        yield f"mysql+mysqldb://root:@127.0.0.1:{port}/test?charset=utf8"
+        yield f"mysql+{mysql_driver}://root:@127.0.0.1:{port}/test?charset=utf8"
 
 elif DBTYPE == "postgres":
-    import platform
-
     if platform.python_implementation() == "PyPy":
         from psycopg2cffi import compat
 
@@ -174,7 +179,7 @@ def clean_db(dbconn):
             "passwd": "",
             "port": port,
         }
-        with MySQLdb.connect(**connection_kwargs) as mysql_conn:
+        with mysql_dbapi.connect(**connection_kwargs) as mysql_conn:
             mysql_conn.query(f"DROP DATABASE IF EXISTS {dbname}")
             mysql_conn.query(
                 f"CREATE DATABASE {dbname} "
