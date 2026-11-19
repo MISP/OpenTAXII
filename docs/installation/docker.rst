@@ -115,7 +115,7 @@ Build the custom image from the directory containing this Dockerfile and your ``
 TAXII 2 instance with Compose
 -----------------------------
 
-The :github-file:`TAXII 2 Compose example <examples/docker-compose-taxii2.yml>` builds OpenTAXII from this checkout. Run these commands from the repository root.
+The TAXII 2 Compose example in ``examples/docker-compose-taxii2.yml`` builds OpenTAXII from this checkout. Run these commands from the repository root.
 
 .. code-block:: shell
 
@@ -128,7 +128,7 @@ The :github-file:`TAXII 2 Compose example <examples/docker-compose-taxii2.yml>` 
 Full Example with Compose
 -------------------------
 
-The :github-file:`full Compose example <examples/docker-compose.yml>` builds OpenTAXII from this checkout and starts two OpenTAXII instances backed by PostgreSQL. It preloads the services, collections, and accounts from ``examples/data-configuration.yml``.
+The full Compose example in ``examples/docker-compose.yml`` builds OpenTAXII from this checkout and starts two OpenTAXII instances backed by PostgreSQL. It preloads the services, collections, and accounts from ``examples/data-configuration.yml``.
 
 Run this command from the repository root.
 
