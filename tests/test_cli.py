@@ -555,7 +555,7 @@ def test_add_api_root(
                     "[--public]",
                     "[--public-write]",
                     ": error: argument -r/--rootid: invalid choice: 'fake-uuid'",
-                    "(choose from WRAPPED_ROOTIDS)",
+                    "(choose from ROOTIDS)",
                 ]
             ),
             None,  # expected_call
@@ -587,14 +587,8 @@ def test_add_api_root(
 def test_add_collection(
     app, db_api_roots, capsys, argv, raises, message, stdout, stderr, expected_call
 ):
-    stderr = stderr.replace(
-        "WRAPPED_ROOTIDS",
-        ",".join([f"'{api_root.id}'" for api_root in db_api_roots]),
-    )
-    stderr = stderr.replace(
-        "ROOTIDS",
-        ",".join([str(api_root.id) for api_root in db_api_roots]),
-    )
+    root_ids = [str(api_root.id) for api_root in db_api_roots]
+    stderr = stderr.replace("ROOTIDS", ",".join(root_ids))
     with (
         mock.patch("opentaxii.cli.persistence.app", app),
         mock.patch("sys.argv", [""] + argv),
@@ -608,7 +602,11 @@ def test_add_collection(
             assert str(exception.value) == message
         captured = capsys.readouterr()
         assert_str_equal_no_formatting(captured.out, stdout)
-        assert_str_equal_no_formatting(captured.err, stderr)
+        # Older argparse versions quote the valid choices in the error message.
+        actual_stderr = captured.err
+        for root_id in root_ids:
+            actual_stderr = actual_stderr.replace(repr(root_id), root_id)
+        assert_str_equal_no_formatting(actual_stderr, stderr)
         if expected_call is None:
             mock_add_collection.assert_not_called()
         else:
