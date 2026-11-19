@@ -2,10 +2,9 @@
 
 .PHONY: all build
 
-REG:="eclecticiq"
-IMAGE:="opentaxii"
+IMAGE ?= opentaxii:local
 
 all: build
 
 build:
-	docker build -t $(REG)/$(IMAGE) ../.
+	docker build -t $(IMAGE) ..

@@ -3,11 +3,12 @@ Run OpenTAXII on Docker
 
 OpenTAXII can also be run using docker. This guide assumes that you have access to a local or remote docker server, and won't go into the setup of docker.
 
-To get a default (development) instance using docker:
+From the root of this repository, build and run a development image.
 
 .. code-block:: shell
 
-    $ docker run -d -p 9000:9000 eclecticiq/opentaxii
+    docker build -t opentaxii:local .
+    docker run --pull=never -d -p 9000:9000 opentaxii:local
 
 To have the instance preloaded with example data, see :ref:`volumes`
 
@@ -82,13 +83,11 @@ This docker container exposes two volumes, which can be attached to a running in
 ``/input/opentaxii.yml``
     To overwrite the default configuration used by the docker instance.
 
+After building ``opentaxii:local``, run this command from the repository root to load the example data.
+
 .. code-block:: shell
 
-    $ pwd
-    /some/path/examples
-    $ ls /some/path/examples
-    data-configuration.yml
-    $ docker run -d -p 9000:9000 -v /some/path/examples:/input eclecticiq/opentaxii
+    docker run --pull=never -d -p 9000:9000 -v "$PWD/examples:/input:ro" opentaxii:local
 
 .. note::
     Make sure your naming is correct. It will only execute actions when files ``data-configuration.yml`` or ``opentaxii.yml`` are present.
@@ -96,69 +95,46 @@ This docker container exposes two volumes, which can be attached to a running in
 Extending
 ---------
 
-If you need custom configuration, and installation of extra/custom code, it is better to extend the OpenTAXII docker image. For example, adding mysql (instead of PostgreSQL), and adding custom code, which is configured in a custom opentaxii.yml. The Dockerfile used will then look something like:
+To install a custom package and supply an OpenTAXII configuration file, use the locally built ``opentaxii:local`` image as the base for a Dockerfile.
 
 .. code-block:: docker
 
-  FROM eclecticiq/opentaxii:latest
-  MAINTAINER EclecticIQ <opentaxii@eclecticiq.com>
+  FROM opentaxii:local
 
-  RUN pip install mysql-python \
-    && pip install custom-package
+  RUN pip install custom-package
 
   COPY opentaxii.yml /input/opentaxii.yml
 
-And building the image is then done using:
+Build the custom image from the directory containing this Dockerfile and your ``opentaxii.yml``.
 
 .. code-block:: shell
 
-  $ docker build -t eclecticiq/opentaxii-mysql .
+  docker build -t opentaxii:custom .
 
 
 TAXII 2 instance with Compose
 -----------------------------
 
-Checkout the configuration at: :github-file:`examples/docker-compose-taxii2.yml <examples/docker-compose-taxii2.yml>`.
+The :github-file:`TAXII 2 Compose example <examples/docker-compose-taxii2.yml>` builds OpenTAXII from this checkout. Run these commands from the repository root.
 
 .. code-block:: shell
 
     # Start
-    docker compose -f examples/docker-compose-taxii2.yml up
+    docker compose -f examples/docker-compose-taxii2.yml up --build
 
     # To add dummy data, run this while the compose project is running
-    docker exec -i examples-opentaxii-1 bash < examples/taxii2/data-setup.sh
+    docker compose -f examples/docker-compose-taxii2.yml exec -T opentaxii bash < examples/taxii2/data-setup.sh
 
 Full Example with Compose
 -------------------------
 
-To see a full example of running OpenTAXII against a "real" database, using the `docker-compose <https://docs.docker.com/compose/>`_ tool, checkout the configuration at: :github-file:`examples/docker-compose.yml <examples/docker-compose.yml>`.
+The :github-file:`full Compose example <examples/docker-compose.yml>` builds OpenTAXII from this checkout and starts two OpenTAXII instances backed by PostgreSQL. It preloads the services, collections, and accounts from ``examples/data-configuration.yml``.
 
-.. code-block:: yaml
+Run this command from the repository root.
 
-    db:
-      image: postgres:9.4
-      environment:
-        POSTGRES_USER: user
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: opentaxii
+.. code-block:: shell
 
-    opentaxii:
-      image: eclecticiq/opentaxii
-      environment:
-        DOCKER_OPENTAXII_AUTH_SECRET: secret
-        OPENTAXII_DOMAIN: 192.168.59.103:9000
-        DATABASE_HOST: db
-        DATABASE_NAME: opentaxii
-        DATABASE_USER: user
-        DATABASE_PASS: password
-      volumes:
-        - ./:/input:ro
-      ports:
-        - 9000:9000
-      links:
-        - db:db
-
-This configuration starts two containers: ``opentaxii`` and ``db``, and creates the given services/collections/accounts.
+    docker compose -f examples/docker-compose.yml up --build
 
 
 .. rubric:: Next steps
