@@ -1,0 +1,5 @@
+/_book/
+/_generated/
+/.quarto/
+/objects.json
+**/*.quarto_ipynb

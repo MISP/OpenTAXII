@@ -1,0 +1,7 @@
+---
+title: "References"
+---
+
+-   [API reference](opentaxii_apis.qmd)
+-   [Public code-level APIs](public_apis.qmd)
+-   [Changelog](changes.qmd)

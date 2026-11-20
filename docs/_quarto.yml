@@ -1,0 +1,120 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "OpenTAXII"
+  subtitle: "Installation, usage, and development"
+  author: "The OpenTAXII contributors"
+  site-url: https://misp.github.io/OpenTAXII/
+  repo-url: https://github.com/MISP/OpenTAXII
+  repo-branch: master
+  repo-subdir: docs
+  repo-actions: [edit, issue]
+  search: true
+  sidebar:
+    style: docked
+    collapse-level: 1
+  page-footer:
+    left: "[OpenTAXII license](https://misp.github.io/OpenTAXII/license.html)"
+    right: "Built with [Quarto](https://quarto.org)"
+  downloads: [pdf, epub]
+  output-file: opentaxii
+  chapters:
+    - index.qmd
+    - part: "Installation"
+      chapters:
+        - installation/index.qmd
+        - installation/installation.qmd
+        - installation/configuration.qmd
+        - installation/docker.qmd
+        - installation/running.qmd
+    - part: "Usage"
+      chapters:
+        - usage/index.qmd
+        - usage/accounts.qmd
+        - usage/taxii1_services_collections.qmd
+        - usage/taxii2_apiroot_collections.qmd
+        - usage/auth.qmd
+        - usage/sending_requests.qmd
+        - usage/health_check.qmd
+    - part: "Contributing"
+      chapters:
+        - contribute/index.qmd
+        - contribute/developer.qmd
+        - contribute/running.qmd
+    - part: "Reference"
+      chapters:
+        - references/index.qmd
+        - references/opentaxii_apis.qmd
+        - references/public_apis.qmd
+        - references/changes.qmd
+        - license.qmd
+
+execute:
+  enabled: false
+
+format:
+  html:
+    grid:
+      sidebar-width: 260px
+      body-width: 850px
+      margin-width: 220px
+    theme:
+      light: [cosmo, assets/opentaxii.scss]
+      dark: [darkly, assets/opentaxii.scss]
+    toc: true
+    toc-depth: 3
+    code-copy: true
+    code-overflow: wrap
+    code-block-bg: true
+    number-sections: false
+  typst:
+    papersize: a4
+    toc: true
+    toc-depth: 2
+    number-sections: false
+  epub:
+    toc: true
+    number-sections: false
+
+quartodoc:
+  style: single-page
+  package: opentaxii
+  source_dir: ..
+  dir: _generated
+  parser: sphinx
+  options:
+    include_empty: true
+  sections:
+    - title: Configuration and server
+      desc: Load configuration, create the Flask application, and access the server interfaces.
+      contents:
+        - config
+        - server.TAXIIServer
+        - server.TAXII1Server
+        - server.TAXII2Server
+        - entities
+        - middleware.create_app
+    - title: TAXII 1 entities and services
+      desc: Work with TAXII 1 entities and service implementations.
+      contents:
+        - taxii.entities
+        - taxii.services.abstract
+        - taxii.services.discovery
+        - taxii.services.inbox
+        - taxii.services.poll
+        - taxii.services.collection_management
+    - title: TAXII 2 entities and validation
+      desc: Work with TAXII 2 resources and request validation.
+      contents:
+        - taxii2.entities
+        - taxii2.validation
+    - title: Persistence, authentication, and signals
+      desc: Extend storage and authentication or subscribe to server signals.
+      contents:
+        - persistence.api
+        - persistence.sqldb.api
+        - auth.api
+        - auth.sqldb.api
+        - signals

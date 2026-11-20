@@ -1,0 +1,64 @@
+/*-- scss:defaults --*/
+$primary: #007f99;
+$font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+$headings-font-weight: 650;
+$line-height-base: 1.65;
+
+/*-- scss:rules --*/
+body {
+  --guide-accent: #00758d;
+  --guide-surface: #f4f8fa;
+  --guide-border: #dce5eb;
+}
+
+body.quarto-dark {
+  --guide-accent: #71d3e5;
+  --guide-surface: #25343f;
+  --guide-border: #43535e;
+}
+
+a:focus-visible, button:focus-visible {
+  outline: 3px solid var(--guide-accent);
+  outline-offset: 3px;
+}
+
+#quarto-sidebar {
+  background: var(--guide-surface);
+  border-right: 1px solid var(--guide-border);
+
+  .sidebar-item-text.active {
+    color: var(--guide-accent);
+    font-weight: 650;
+  }
+}
+
+.guide-home {
+  .guide-lead { font-size: 1.2rem; }
+
+  .guide-links {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin-block: 1.75rem 2rem;
+
+    > p { display: flex; margin: 0; }
+  }
+
+  .guide-link {
+    display: block;
+    width: 100%;
+    padding: 1.1rem;
+    border: 1px solid var(--guide-border);
+    border-radius: 0.45rem;
+    background: var(--guide-surface);
+    color: var(--bs-body-color);
+    text-decoration: none;
+
+    strong { display: block; color: var(--guide-accent); }
+    &:hover { border-color: var(--guide-accent); }
+  }
+}
+
+@media (max-width: 767.98px) {
+  .guide-home .guide-links { grid-template-columns: 1fr; }
+}
