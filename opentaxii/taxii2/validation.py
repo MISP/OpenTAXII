@@ -5,6 +5,7 @@ import json
 from typing import Mapping, Union
 
 from marshmallow import Schema, fields
+from marshmallow.validate import Range
 from stix2 import parse
 from stix2.exceptions import STIXError
 
@@ -100,7 +101,7 @@ class PersistenceApiMxin:
 class VersionFilterParamsSchema(PersistenceApiMxin, Schema):
     """Schema for the versions endpoint filters."""
 
-    limit = fields.Int()
+    limit = fields.Int(validate=Range(min=1))
     added_after = Taxii2DateTime()
     next_kwargs = Taxii2Next(data_key="next")
     match_spec_version = Taxii2Filter(data_key="match[spec_version]")
@@ -109,7 +110,7 @@ class VersionFilterParamsSchema(PersistenceApiMxin, Schema):
 class ObjectFilterParamsSchema(PersistenceApiMxin, Schema):
     """Schema for the object endpoint filters."""
 
-    limit = fields.Int()
+    limit = fields.Int(validate=Range(min=1))
     added_after = Taxii2DateTime()
     next_kwargs = Taxii2Next(data_key="next")
     match_spec_version = Taxii2Filter(data_key="match[spec_version]")
@@ -119,7 +120,7 @@ class ObjectFilterParamsSchema(PersistenceApiMxin, Schema):
 class ListFilterParamsSchema(PersistenceApiMxin, Schema):
     """Schema for the object list endpoint filters."""
 
-    limit = fields.Int()
+    limit = fields.Int(validate=Range(min=1))
     added_after = Taxii2DateTime()
     next_kwargs = Taxii2Next(data_key="next")
     match_spec_version = Taxii2Filter(data_key="match[spec_version]")

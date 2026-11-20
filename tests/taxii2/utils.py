@@ -377,9 +377,10 @@ def GET_MANIFEST_MOCK(
 
 
 def GET_NEXT_PARAM(kwargs: Dict) -> str:
-    return base64.b64encode(
-        f"{kwargs['date_added'].isoformat()}|{kwargs['id']}".encode("utf-8")
-    ).decode()
+    token = f"{kwargs['date_added'].isoformat()}|{kwargs['id']}"
+    if "version" in kwargs:
+        token += f"|{kwargs['version'].isoformat()}"
+    return base64.b64encode(token.encode("utf-8")).decode()
 
 
 def GET_OBJECTS_MOCK(
@@ -423,8 +424,9 @@ def GET_OBJECTS_MOCK(
                 continue
             response.append(stix_object)
     if more:
+        last = response[-1]
         next_param = GET_NEXT_PARAM(
-            {"id": response[-1].id, "date_added": response[-1].date_added}
+            {"id": last.id, "date_added": last.date_added, "version": last.version}
         )
     else:
         next_param = None
@@ -471,8 +473,9 @@ def GET_OBJECT_MOCK(
                 continue
             response.append(stix_object)
     if more:
+        last = response[-1]
         next_param = GET_NEXT_PARAM(
-            {"id": response[-1].id, "date_added": response[-1].date_added}
+            {"id": last.id, "date_added": last.date_added, "version": last.version}
         )
     else:
         next_param = None
