@@ -1,4 +1,7 @@
 Copyright (c) [2016], EclecticIQ
+
+Copyright (c) 2026, MISP Project
+
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
