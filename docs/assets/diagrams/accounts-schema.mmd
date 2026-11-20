@@ -1,0 +1,11 @@
+erDiagram
+  accTitle: Authentication database schema
+  accDescr: The accounts table stores unique usernames, password hashes, administrator flags and permissions. Collection permissions are serialized as JSON in a text column.
+
+  accounts {
+    int id PK
+    string username UK
+    string password_hash
+    bool is_admin
+    text _permissions
+  }

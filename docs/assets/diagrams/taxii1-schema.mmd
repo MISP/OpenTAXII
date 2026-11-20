@@ -1,0 +1,64 @@
+erDiagram
+  direction TB
+  accTitle: TAXII 1.x database schema
+  accDescr: Services handle inbox messages and subscriptions. Inbox messages can contain content blocks. Two join tables associate collections with services and content blocks. Collections also track poll result sets and subscriptions.
+
+  services |o..o{ inbox_messages : receives
+  inbox_messages |o..o{ content_blocks : includes
+  services ||--o{ service_to_collection : links
+  data_collections ||--o{ service_to_collection : maps
+  data_collections ||--o{ collection_to_content_block : groups
+  collection_to_content_block }o--|| content_blocks : references
+  data_collections |o..o{ result_sets : paginates
+  data_collections |o..o{ subscriptions : supplies
+  services |o..o{ subscriptions : handles
+
+  services {
+    string id PK
+    string type
+    text _properties
+  }
+  data_collections {
+    int id PK
+    string name UK
+    string type
+    text bindings
+    bool available
+    int volume
+  }
+  inbox_messages {
+    int id PK
+    string service_id FK
+    text message_id
+    binary original_message
+    int content_block_count
+  }
+  content_blocks {
+    int id PK
+    int inbox_message_id FK
+    datetime timestamp_label
+    binary content
+    string binding_id
+    string binding_subtype
+  }
+  service_to_collection {
+    string service_id PK, FK
+    int collection_id PK, FK
+  }
+  collection_to_content_block {
+    int collection_id PK, FK
+    int content_block_id PK, FK
+  }
+  result_sets {
+    string id PK
+    int collection_id FK
+    datetime begin_time
+    datetime end_time
+  }
+  subscriptions {
+    string id PK
+    int collection_id FK
+    string service_id FK
+    string status
+    text params
+  }

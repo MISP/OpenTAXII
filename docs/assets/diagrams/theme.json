@@ -1,0 +1,42 @@
+{
+  "mermaid": {
+    "startOnLoad": false,
+    "securityLevel": "strict",
+    "theme": "base",
+    "htmlLabels": false,
+    "deterministicIds": true,
+    "handDrawnSeed": 1,
+    "fontFamily": "DejaVu Sans, sans-serif",
+    "themeCSS": ".edgeLabel rect.background { fill: #ffffff; } .edgeLabel text { fill: #203344; }",
+    "flowchart": {
+      "htmlLabels": false,
+      "curve": "linear"
+    },
+    "er": {
+      "nodeSpacing": 36,
+      "rankSpacing": 62
+    },
+    "themeVariables": {
+      "primaryColor": "#f4f8fa",
+      "primaryTextColor": "#203344",
+      "primaryBorderColor": "#007f99",
+      "lineColor": "#576978",
+      "textColor": "#203344",
+      "secondaryColor": "#e3f2f5",
+      "tertiaryColor": "#ffffff",
+      "edgeLabelBackground": "#ffffff",
+      "attributeBackgroundColorEven": "#f4f8fa",
+      "attributeBackgroundColorOdd": "#ffffff",
+      "fontSize": "16px"
+    }
+  },
+  "frame": {
+    "background": "#ffffff",
+    "border": "#dce5eb",
+    "padding": 20,
+    "headerHeight": 64,
+    "graphGap": 16,
+    "logoWidth": 132,
+    "logoTop": 12
+  }
+}
