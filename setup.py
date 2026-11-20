@@ -21,12 +21,18 @@ install_requires = get_file_contents('requirements.txt').split()
 
 setup(
     name='opentaxii',
-    description='TAXII server implementation in Python from EclecticIQ',
+    description='TAXII server implementation in Python maintained by the MISP Project',
     long_description=get_file_contents('README.md'),
     long_description_content_type='text/markdown',
-    url='https://github.com/EclecticIQ/OpenTAXII',
+    url='https://github.com/MISP/OpenTAXII',
     author='EclecticIQ',
     author_email='opentaxii@eclecticiq.com',
+    maintainer='MISP Project',
+    project_urls={
+        'Documentation': 'https://misp.github.io/OpenTAXII/',
+        'EclecticIQ upstream': 'https://github.com/EclecticIQ/OpenTAXII',
+        'MISP Project': 'https://misp-project.org/',
+    },
     version=__version__,
     license='BSD License',
     packages=find_packages(exclude=['tests']),

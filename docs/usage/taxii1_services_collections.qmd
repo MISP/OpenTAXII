@@ -11,7 +11,7 @@ The services and collections created with CLI command `opentaxii-sync-data` are 
 
 ## Step 1
 
-Create YAML file with collections/services/accounts configuration. See provided example from [OpenTAXII git repo](https://github.com/eclecticiq/OpenTAXII) --- file [examples/data-configuration.yml](https://github.com/MISP/OpenTAXII/blob/master/examples/data-configuration.yml) that contains:
+Create a YAML file with your collections, services, and accounts. The example below comes from the MISP-maintained fork. [Example configuration](https://github.com/MISP/OpenTAXII/blob/master/examples/data-configuration.yml) · [EclecticIQ upstream](https://github.com/eclecticiq/OpenTAXII) · [MISP Project](https://misp-project.org/)
 
 Services:
 
