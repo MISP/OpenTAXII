@@ -506,22 +506,31 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
         :return: The value to use as `next` param
         :rtype: str
         """
-        return base64.b64encode(
-            f"{kwargs['date_added'].isoformat()}|{kwargs['id']}".encode("utf-8")
-        ).decode()
+        parts = [kwargs["date_added"].isoformat(), kwargs["id"]]
+        if "version" in kwargs:
+            parts.append(kwargs["version"].isoformat())
+        return base64.b64encode("|".join(parts).encode("utf-8")).decode()
 
     @staticmethod
     def parse_next_param(next_param: str) -> Dict:
         """
         Parse provided `next_param` into kwargs to be used to filter stix objects.
         """
-        date_added_str, obj_id = (
-            base64.b64decode(next_param.encode()).decode().split("|")
+
+        def parse_timestamp(value: str) -> datetime.datetime:
+            timestamp = datetime.datetime.fromisoformat(value)
+            if timestamp.tzinfo is None:
+                return timestamp.replace(tzinfo=datetime.timezone.utc)
+            return timestamp.astimezone(datetime.timezone.utc)
+
+        date_added, obj_id, *remaining = (
+            base64.b64decode(next_param, validate=True).decode().split("|")
         )
-        date_added = datetime.datetime.strptime(
-            date_added_str.split("+")[0], "%Y-%m-%dT%H:%M:%S.%f"
-        ).replace(tzinfo=datetime.timezone.utc)
-        return {"id": obj_id, "date_added": date_added}
+        cursor = {"id": obj_id, "date_added": parse_timestamp(date_added)}
+        if remaining:
+            (version,) = remaining
+            cursor["version"] = parse_timestamp(version)
+        return cursor
 
     def get_api_roots(self) -> List[entities.ApiRoot]:
         query = self.db.session.query(taxii2models.ApiRoot).order_by("title")
@@ -753,7 +762,9 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
         )
         if ordered:
             query = query.order_by(
-                taxii2models.STIXObject.date_added, taxii2models.STIXObject.id
+                taxii2models.STIXObject.date_added,
+                taxii2models.STIXObject.id,
+                taxii2models.STIXObject.version,
             )
         return query
 
@@ -768,11 +779,21 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
         self, query: Query, next_kwargs: Optional[Dict] = None
     ) -> Query:
         if next_kwargs is not None:
+            obj = taxii2models.STIXObject
+            after_object = obj.id > next_kwargs["id"]
+            # Older cursors ended at the object ID within a timestamp.
+            if "version" in next_kwargs:
+                after_object = or_(
+                    after_object,
+                    and_(
+                        obj.id == next_kwargs["id"],
+                        obj.version > next_kwargs["version"],
+                    ),
+                )
             query = query.filter(
-                (taxii2models.STIXObject.date_added > next_kwargs["date_added"])
-                | (
-                    (taxii2models.STIXObject.date_added == next_kwargs["date_added"])
-                    & (taxii2models.STIXObject.id > next_kwargs["id"])
+                or_(
+                    obj.date_added > next_kwargs["date_added"],
+                    and_(obj.date_added == next_kwargs["date_added"], after_object),
                 )
             )
         return query
@@ -854,20 +875,17 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
             )
         return query
 
-    def _apply_limit(
+    def _fetch_page(
         self, query: Query, limit: Optional[int] = None
-    ) -> Tuple[Query, bool]:
-        if limit is not None:
-            more = limit < query.limit(limit + 1).count()
-            query = query.limit(limit)
-        else:
-            more = False
-        return query, more
+    ) -> Tuple[List, bool]:
+        if limit is None:
+            return query.all(), False
+        rows = query.limit(limit + 1).all()
+        return rows[:limit], len(rows) > limit
 
     def _filtered_objects_query(
         self,
         collection_id: uuid.UUID,
-        limit: Optional[int] = None,
         added_after: Optional[datetime.datetime] = None,
         next_kwargs: Optional[Dict] = None,
         match_id: Optional[List[str]] = None,
@@ -875,7 +893,7 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
         match_version: Optional[List[str]] = None,
         match_spec_version: Optional[List[str]] = None,
         ordered: bool = True,
-    ) -> Tuple[Query, bool]:
+    ) -> Query:
         query = self._objects_query(collection_id, ordered)
         query = self._apply_added_after(query, added_after)
         query = self._apply_next_kwargs(query, next_kwargs)
@@ -883,8 +901,7 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
         query = self._apply_match_type(query, match_type)
         query = self._apply_match_version(query, collection_id, match_version)
         query = self._apply_match_spec_version(query, match_spec_version)
-        query, more = self._apply_limit(query, limit)
-        return query, more
+        return query
 
     def get_manifest(
         self,
@@ -897,9 +914,8 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
         match_version: Optional[List[str]] = None,
         match_spec_version: Optional[List[str]] = None,
     ) -> Tuple[List[entities.ManifestRecord], bool]:
-        query, more = self._filtered_objects_query(
+        query = self._filtered_objects_query(
             collection_id=collection_id,
-            limit=limit,
             added_after=added_after,
             next_kwargs=next_kwargs,
             match_id=match_id,
@@ -915,6 +931,7 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
                 taxii2models.STIXObject.spec_version,
             )
         )
+        items, more = self._fetch_page(query, limit)
         return (
             [
                 entities.ManifestRecord(
@@ -923,7 +940,7 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
                     version=obj.version,
                     spec_version=obj.spec_version,
                 )
-                for obj in query.all()
+                for obj in items
             ],
             more,
         )
@@ -939,9 +956,8 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
         match_version: Optional[List[str]] = None,
         match_spec_version: Optional[List[str]] = None,
     ) -> Tuple[List[entities.STIXObject], bool, Optional[str]]:
-        query, more = self._filtered_objects_query(
+        query = self._filtered_objects_query(
             collection_id=collection_id,
-            limit=limit,
             added_after=added_after,
             next_kwargs=next_kwargs,
             match_id=match_id,
@@ -949,10 +965,11 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
             match_version=match_version,
             match_spec_version=match_spec_version,
         )
-        items = query.all()
-        if more:
+        items, more = self._fetch_page(query, limit)
+        if more and items:
+            last = items[-1]
             next_param = self.get_next_param(
-                {"id": items[-1].id, "date_added": items[-1].date_added}
+                {"id": last.id, "date_added": last.date_added, "version": last.version}
             )
         else:
             next_param = None
@@ -1063,19 +1080,19 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
             .scalar()
         ):
             return (None, False, None)
-        query, more = self._filtered_objects_query(
+        query = self._filtered_objects_query(
             collection_id=collection_id,
-            limit=limit,
             added_after=added_after,
             next_kwargs=next_kwargs,
             match_id=[object_id],
             match_version=match_version,
             match_spec_version=match_spec_version,
         )
-        items = query.all()
-        if more:
+        items, more = self._fetch_page(query, limit)
+        if more and items:
+            last = items[-1]
             next_param = self.get_next_param(
-                {"id": items[-1].id, "date_added": items[-1].date_added}
+                {"id": last.id, "date_added": last.date_added, "version": last.version}
             )
         else:
             next_param = None
@@ -1105,7 +1122,7 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
     ) -> None:
         if match_version is None:
             match_version = ["all"]
-        query, _ = self._filtered_objects_query(
+        query = self._filtered_objects_query(
             collection_id=collection_id,
             match_id=[object_id],
             match_version=match_version,
@@ -1142,9 +1159,8 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
             .scalar()
         ):
             return (None, False)
-        query, more = self._filtered_objects_query(
+        query = self._filtered_objects_query(
             collection_id=collection_id,
-            limit=limit,
             added_after=added_after,
             next_kwargs=next_kwargs,
             match_id=[object_id],
@@ -1157,13 +1173,14 @@ class Taxii2SQLDatabaseAPI(BaseSQLDatabaseAPI, OpenTAXII2PersistenceAPI):
                 taxii2models.STIXObject.version,
             )
         )
+        items, more = self._fetch_page(query, limit)
         return (
             [
                 entities.VersionRecord(
                     date_added=obj.date_added,
                     version=obj.version,
                 )
-                for obj in query.all()
+                for obj in items
             ],
             more,
         )

@@ -151,6 +151,13 @@ from tests.taxii2.utils import (
             },
             {
                 "more": True,
+                "next": GET_NEXT_PARAM(
+                    {
+                        "date_added": STIX_OBJECTS[0].date_added,
+                        "id": STIX_OBJECTS[0].id,
+                        "version": STIX_OBJECTS[0].version,
+                    }
+                ),
                 "objects": [
                     {
                         "id": obj.id,

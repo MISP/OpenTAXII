@@ -181,7 +181,11 @@ from tests.utils import SKIP
             {
                 "more": True,
                 "next": GET_NEXT_PARAM(
-                    {"id": STIX_OBJECTS[0].id, "date_added": STIX_OBJECTS[0].date_added}
+                    {
+                        "id": STIX_OBJECTS[0].id,
+                        "date_added": STIX_OBJECTS[0].date_added,
+                        "version": STIX_OBJECTS[0].version,
+                    }
                 ),
                 "objects": [
                     {

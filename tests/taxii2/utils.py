@@ -377,9 +377,18 @@ def GET_MANIFEST_MOCK(
 
 
 def GET_NEXT_PARAM(kwargs: Dict) -> str:
-    return base64.b64encode(
-        f"{kwargs['date_added'].isoformat()}|{kwargs['id']}".encode("utf-8")
-    ).decode()
+    token = f"{kwargs['date_added'].isoformat()}|{kwargs['id']}"
+    if "version" in kwargs:
+        token += f"|{kwargs['version'].isoformat()}"
+    return base64.b64encode(token.encode("utf-8")).decode()
+
+
+def _follows_cursor(obj: STIXObject, cursor: Dict) -> bool:
+    position = (obj.date_added, obj.id)
+    cursor_position = (cursor["date_added"], cursor["id"])
+    if position == cursor_position:
+        return "version" in cursor and obj.version > cursor["version"]
+    return position > cursor_position
 
 
 def GET_OBJECTS_MOCK(
@@ -393,38 +402,37 @@ def GET_OBJECTS_MOCK(
     match_spec_version: Optional[List[str]] = None,
 ):
     id_version_combos = process_match_version(match_version)
-    response: List = []
+    response: List[STIXObject] = []
     more = False
-    for stix_object in STIX_OBJECTS:
+    for stix_object in sorted(
+        STIX_OBJECTS, key=lambda obj: (obj.date_added, obj.id, obj.version)
+    ):
         if (
-            stix_object.collection_id == collection_id
-            and (stix_object.id, stix_object.version) in id_version_combos
+            stix_object.collection_id != collection_id
+            or (stix_object.id, stix_object.version) not in id_version_combos
         ):
-            if limit is not None and limit == len(response):
-                more = True
-                break
-            if added_after is not None:
-                if stix_object.date_added <= added_after:
-                    continue
-            if next_kwargs is not None:
-                if stix_object.date_added < next_kwargs["date_added"] or (
-                    stix_object.date_added == next_kwargs["date_added"]
-                    and stix_object.id == next_kwargs["id"]
-                ):
-                    continue
-            if match_id is not None and stix_object.id not in match_id:
-                continue
-            if match_type is not None and stix_object.type not in match_type:
-                continue
-            if (
-                match_spec_version is not None
-                and stix_object.spec_version not in match_spec_version
-            ):
-                continue
-            response.append(stix_object)
-    if more:
+            continue
+        if added_after is not None and stix_object.date_added <= added_after:
+            continue
+        if next_kwargs is not None and not _follows_cursor(stix_object, next_kwargs):
+            continue
+        if match_id is not None and stix_object.id not in match_id:
+            continue
+        if match_type is not None and stix_object.type not in match_type:
+            continue
+        if (
+            match_spec_version is not None
+            and stix_object.spec_version not in match_spec_version
+        ):
+            continue
+        if limit is not None and limit == len(response):
+            more = True
+            break
+        response.append(stix_object)
+    if more and response:
+        last = response[-1]
         next_param = GET_NEXT_PARAM(
-            {"id": response[-1].id, "date_added": response[-1].date_added}
+            {"id": last.id, "date_added": last.date_added, "version": last.version}
         )
     else:
         next_param = None
@@ -440,45 +448,20 @@ def GET_OBJECT_MOCK(
     match_version: Optional[List[str]] = None,
     match_spec_version: Optional[List[str]] = None,
 ):
-    id_version_combos = process_match_version(match_version)
-    response: List = []
-    more = False
-    at_least_one = False
-    for stix_object in STIX_OBJECTS:
-        if stix_object.collection_id == collection_id and stix_object.id == object_id:
-            at_least_one = True
-            if (
-                stix_object.id,
-                stix_object.version,
-            ) not in id_version_combos:
-                continue
-            if limit is not None and limit == len(response):
-                more = True
-                break
-            if added_after is not None:
-                if stix_object.date_added <= added_after:
-                    continue
-            if next_kwargs is not None:
-                if stix_object.date_added < next_kwargs["date_added"] or (
-                    stix_object.date_added == next_kwargs["date_added"]
-                    and stix_object.id == next_kwargs["id"]
-                ):
-                    continue
-            if (
-                match_spec_version is not None
-                and stix_object.spec_version not in match_spec_version
-            ):
-                continue
-            response.append(stix_object)
-    if more:
-        next_param = GET_NEXT_PARAM(
-            {"id": response[-1].id, "date_added": response[-1].date_added}
-        )
-    else:
-        next_param = None
-    if not at_least_one:
-        response = None  # type: ignore[assignment]
-    return response, more, next_param
+    if not any(
+        obj.collection_id == collection_id and obj.id == object_id
+        for obj in STIX_OBJECTS
+    ):
+        return None, False, None
+    return GET_OBJECTS_MOCK(
+        collection_id=collection_id,
+        limit=limit,
+        added_after=added_after,
+        next_kwargs=next_kwargs,
+        match_id=[object_id],
+        match_version=match_version,
+        match_spec_version=match_spec_version,
+    )
 
 
 def ADD_OBJECTS_MOCK(api_root_id: UUID, collection_id: str, objects: List[Dict]):

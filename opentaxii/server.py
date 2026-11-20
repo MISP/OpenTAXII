@@ -2,6 +2,7 @@ import functools
 import importlib
 import json
 import uuid
+from datetime import datetime
 
 try:
     from re import Pattern
@@ -528,6 +529,22 @@ class TAXII2Server(BaseTAXIIServer):
         self.check_headers(endpoint)
         return endpoint()
 
+    def _add_record_cursor(
+        self, response: dict, object_id: str, date_added: datetime, version: datetime
+    ) -> None:
+        encode_cursor = getattr(self.persistence.api, "get_next_param", None)
+        if encode_cursor is None:
+            return
+        try:
+            next_param = encode_cursor(
+                {"id": object_id, "date_added": date_added, "version": version}
+            )
+        except NotImplementedError:
+            # Persistence backends can use date-based paging without cursors.
+            return
+        if next_param is not None:
+            response["next"] = next_param
+
     @register_handler(r"^/taxii2/$", handles_own_auth=True)
     def discovery_handler(self):
         if context.account is None and not self.config.get("public_discovery", False):
@@ -682,6 +699,11 @@ class TAXII2Server(BaseTAXIIServer):
                     for obj in manifest
                 ],
             }
+            if more:
+                last = manifest[-1]
+                self._add_record_cursor(
+                    response, last.id, last.date_added, last.version
+                )
             headers = {
                 "X-TAXII-Date-Added-First": min(
                     obj["date_added"] for obj in response["objects"]
@@ -896,6 +918,11 @@ class TAXII2Server(BaseTAXIIServer):
                 "more": more,
                 "versions": [taxii2_datetimeformat(obj.version) for obj in versions],
             }
+            if more:
+                last = versions[-1]
+                self._add_record_cursor(
+                    response, object_id, last.date_added, last.version
+                )
             headers = {
                 "X-TAXII-Date-Added-First": taxii2_datetimeformat(
                     min(obj.date_added for obj in versions)
