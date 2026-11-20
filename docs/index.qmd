@@ -9,6 +9,8 @@ format:
 OpenTAXII is a Python implementation of TAXII for sharing cyber threat intelligence.
 :::
 
+EclecticIQ originally developed OpenTAXII. The MISP Project fully maintains this fork. [EclecticIQ](https://www.eclecticiq.com) · [MISP Project](https://misp-project.org/)
+
 TAXII (Trusted Automated eXchange of Indicator Information) defines services and message exchanges for sharing threat intelligence between organizations. OpenTAXII implements TAXII 1.0 and 1.1 services and provides TAXII 2.1 endpoints for exchanging STIX content.
 
 ::: {.content-visible when-format="html"}

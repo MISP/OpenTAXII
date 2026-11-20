@@ -1,6 +1,6 @@
 # OpenTAXII
 
-TAXII server implementation in Python from [EclecticIQ](https://www.eclecticiq.com).
+EclecticIQ originally developed OpenTAXII, a TAXII server in Python. The MISP Project fully maintains this fork. [EclecticIQ](https://www.eclecticiq.com) · [MISP Project](https://misp-project.org/)
 
 OpenTAXII is a robust Python implementation of TAXII Services that
 delivers rich feature set and friendly pythonic API built on top of well
@@ -8,16 +8,16 @@ designed application.
 
 OpenTAXII is guaranteed to be compatible with [Cabby](https://github.com/eclecticiq/cabby), TAXII client library.
 
-[Source](https://github.com/eclecticiq/OpenTAXII) | [Documentation](https://misp.github.io/OpenTAXII/) | [Information](http://www.eclecticiq.com) | [Download](https://pypi.python.org/pypi/opentaxii/)
+[MISP fork](https://github.com/MISP/OpenTAXII) | [EclecticIQ upstream](https://github.com/eclecticiq/OpenTAXII) | [Documentation](https://misp.github.io/OpenTAXII/) | [Download](https://pypi.org/project/opentaxii/)
 
 
-[![Build status](https://github.com/eclecticiq/OpenTAXII/actions/workflows/tox.yml/badge.svg?branch=master)](https://github.com/eclecticiq/OpenTAXII/actions/workflows/tox.yml?query=branch%3Amaster+)
-[![Coverage Status](https://coveralls.io/repos/eclecticiq/OpenTAXII/badge.svg)](https://coveralls.io/r/eclecticiq/OpenTAXII)
+[![Build status](https://github.com/MISP/OpenTAXII/actions/workflows/tox.yml/badge.svg?branch=master)](https://github.com/MISP/OpenTAXII/actions/workflows/tox.yml?query=branch%3Amaster)
+[![Upstream coverage](https://coveralls.io/repos/eclecticiq/OpenTAXII/badge.svg)](https://coveralls.io/r/eclecticiq/OpenTAXII "EclecticIQ upstream coverage")
 [![Documentation](https://github.com/MISP/OpenTAXII/actions/workflows/quarto.yml/badge.svg?branch=master)](https://misp.github.io/OpenTAXII/)
 
 ## State of the project
 
-We have made the decision to consider this project **feature-complete**. It means we still maintain it, however we focus only on bug fixes. Still, we’re very open to external contributions - if you know how to fix an issue and you can open a PR, we will be very grateful.
+EclecticIQ considers the upstream project **feature-complete** and focuses on bug fixes. Contributions to the MISP fork are welcome.
 
 ## Getting started
 
@@ -47,6 +47,5 @@ See the [Docker guide](https://misp.github.io/OpenTAXII/installation/docker.html
 
 ## Feedback
 
-You are encouraged to provide feedback by commenting on open issues or
-sending us email at <opentaxii@eclecticiq.com>
+Report bugs or suggest improvements in the MISP fork’s issue tracker. [OpenTAXII issues](https://github.com/MISP/OpenTAXII/issues)
 
