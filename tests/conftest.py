@@ -2,7 +2,6 @@ import base64
 import os
 import platform
 from importlib import import_module
-from tempfile import mkstemp
 from unittest.mock import patch
 
 import pytest
@@ -48,21 +47,7 @@ class CustomClient(FlaskClient):
 
 
 DBTYPE = os.getenv("DBTYPE", "sqlite")
-if DBTYPE == "sqlite":
-
-    @pytest.fixture(scope="session")
-    def dbconn():
-        filehandle, filename = mkstemp(suffix=".db")
-        os.close(filehandle)
-        try:
-            yield f"sqlite:///{filename}"
-        finally:
-            try:
-                os.remove(filename)
-            except FileNotFoundError:
-                pass
-
-elif DBTYPE in ("mysql", "mariadb"):
+if DBTYPE in ("mysql", "mariadb"):
     if platform.python_implementation() == "PyPy":
         mysql_dbapi = import_module("pymysql")
         mysql_driver = "pymysql"
@@ -90,7 +75,7 @@ elif DBTYPE == "postgres":
     def dbconn():
         yield "postgresql+psycopg2://test:test@127.0.0.1:5432/test"
 
-else:
+elif DBTYPE != "sqlite":
     raise NotImplementedError(f"dbtype {DBTYPE} not supported")
 
 
@@ -146,12 +131,9 @@ def anonymous_user():
     release_context()
 
 
-def clean_db(dbconn):
+def clean_db():
     # drop and recreate db to provide clean state at beginning
-    if DBTYPE == "sqlite":
-        filename = dbconn[len("sqlite:///") :]
-        os.remove(filename)
-    elif DBTYPE == "postgres":
+    if DBTYPE == "postgres":
         with psycopg2.connect(
             dbname="test",
             user="test",
@@ -188,22 +170,30 @@ def clean_db(dbconn):
             )
 
 
-@pytest.fixture(scope="session")
-def session_taxiiserver(dbconn):
-    clean_db(dbconn)
-    yield TAXIIServer(prepare_test_config(dbconn))
+if DBTYPE == "sqlite":
+
+    @pytest.fixture()
+    def app(tmp_path):
+        # Each test needs a new path for SQLite's database and rollback journal.
+        yield from isolated_app(f"sqlite:///{tmp_path / 'opentaxii.db'}")
+
+else:
+
+    @pytest.fixture(scope="session")
+    def session_taxiiserver(dbconn):
+        clean_db()
+        yield TAXIIServer(prepare_test_config(dbconn))
+
+    @pytest.fixture()
+    def app(request, dbconn, session_taxiiserver):
+        if request.node.get_closest_marker("truncate"):
+            clean_db()
+            yield from isolated_app(dbconn)
+        else:
+            yield from transaction_app(session_taxiiserver)
 
 
-@pytest.fixture()
-def app(request, dbconn, session_taxiiserver):
-    truncate = request.node.get_closest_marker("truncate") or DBTYPE == "sqlite"
-    if truncate:
-        yield from truncate_app(dbconn)
-    else:
-        yield from transaction_app(dbconn, session_taxiiserver)
-
-
-def transaction_app(dbconn, taxiiserver):
+def transaction_app(taxiiserver):
     context.server = taxiiserver
     app = create_app(context.server)
     app.config["TESTING"] = True
@@ -230,15 +220,21 @@ def transaction_app(dbconn, taxiiserver):
         manager.api.db._session = None
 
 
-def truncate_app(dbconn):
-    clean_db(dbconn)
+def isolated_app(dbconn):
     taxiiserver = TAXIIServer(prepare_test_config(dbconn))
     context.server = taxiiserver
     app = create_app(context.server)
     app.config["TESTING"] = True
-    yield app
-    taxiiserver.servers.taxii1.persistence.api.db.engine.dispose()  # type: ignore[union-attr]
-    taxiiserver.servers.taxii2.persistence.api.db.engine.dispose()  # type: ignore[union-attr]
+    try:
+        yield app
+    finally:
+        databases = [taxiiserver.auth.api.db] + [
+            server.persistence.api.db for server in taxiiserver.real_servers
+        ]
+        for database in databases:
+            database.session.remove()
+            database.engine.dispose()
+        release_context()
 
 
 @pytest.fixture()
