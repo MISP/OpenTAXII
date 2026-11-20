@@ -1342,6 +1342,11 @@ def test_objects_unauthenticated(
             **kwargs,
         )
     assert response.status_code == expected_status_code
+    assert response.headers.getlist("WWW-Authenticate") == (
+        ['Basic realm="OpenTAXII"', 'Bearer realm="OpenTAXII"']
+        if expected_status_code == 401
+        else []
+    )
     if method == "post" and expected_status_code == 202:
         add_objects_mock.assert_called_once_with(
             api_root_id=API_ROOTS[0].id,

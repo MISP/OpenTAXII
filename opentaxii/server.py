@@ -1034,10 +1034,19 @@ class TAXIIServer:
     def handle_http_exception(self, error):
         """Dispatch http exception handling to appropriate taxii* server."""
         server = self.current_server
-        if server:
-            return server.handle_http_exception(error)
-        else:
+        if server is None:
             return error.get_response()
+
+        response = server.handle_http_exception(error)
+        if (
+            isinstance(server, TAXII2Server)
+            and response.status_code == 401
+            and "WWW-Authenticate" not in response.headers
+        ):
+            if self.is_basic_auth_supported():
+                response.headers.add("WWW-Authenticate", 'Basic realm="OpenTAXII"')
+            response.headers.add("WWW-Authenticate", 'Bearer realm="OpenTAXII"')
+        return response
 
     def handle_validation_exception(self, error):
         """Dispatch validation exception handling to appropriate taxii* server."""

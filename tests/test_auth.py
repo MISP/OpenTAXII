@@ -486,7 +486,19 @@ def prepare_inbox_message(version, blocks=None, dest_collection=None):
     return inbox_message
 
 
-def test_broken_bearer_token_taxii2(client):
+@pytest.mark.parametrize("basic_auth_supported", [True, False])
+def test_broken_bearer_token_taxii2(client, monkeypatch, basic_auth_supported):
+    monkeypatch.setitem(
+        client.application.taxii_server.config,
+        "support_basic_auth",
+        basic_auth_supported,
+    )
     headers = {HTTP_AUTHORIZATION: "Bearer broken"}
     response = client.get("/taxii2/", headers=headers)
     assert response.status_code == 401
+    assert response.content_type == "application/taxii+json;version=2.1"
+    assert response.get_json()["code"] == 401
+    expected_challenges = ['Bearer realm="OpenTAXII"']
+    if basic_auth_supported:
+        expected_challenges.insert(0, 'Basic realm="OpenTAXII"')
+    assert response.headers.getlist("WWW-Authenticate") == expected_challenges

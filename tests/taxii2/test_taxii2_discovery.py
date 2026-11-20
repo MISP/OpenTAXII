@@ -190,3 +190,8 @@ def test_discovery_unauthenticated(
             headers={"Accept": "application/taxii+json;version=2.1"},
         )
     assert response.status_code == expected_status_code
+    assert response.headers.getlist("WWW-Authenticate") == (
+        ['Basic realm="OpenTAXII"', 'Bearer realm="OpenTAXII"']
+        if expected_status_code == 401
+        else []
+    )
