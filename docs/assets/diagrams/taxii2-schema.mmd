@@ -1,0 +1,55 @@
+erDiagram
+  direction TB
+  accTitle: TAXII 2.1 database schema
+  accDescr: API roots expose collections and track submission jobs. Collections store STIX object versions. Job details record the outcome for each submitted object.
+
+  opentaxii_api_root |o..o{ opentaxii_collection : exposes
+  opentaxii_api_root |o..o{ opentaxii_job : tracks
+  opentaxii_collection |o..o{ opentaxii_stixobject : stores
+  opentaxii_job |o..o{ opentaxii_job_detail : records
+
+  opentaxii_api_root {
+    uuid id PK
+    string title
+    text description
+    bool default
+    bool is_public
+  }
+  opentaxii_collection {
+    uuid id PK
+    uuid api_root_id FK
+    string title
+    text description
+    string alias
+    bool is_public
+    bool is_public_write
+  }
+  opentaxii_stixobject {
+    uuid *pk PK
+    uuid collection_id FK
+    string id
+    string type
+    string spec_version
+    datetime date_added
+    datetime version
+    json serialized_data
+  }
+  opentaxii_job {
+    uuid id PK
+    uuid api_root_id FK
+    enum status
+    datetime request_timestamp
+    datetime completed_timestamp
+    int total_count
+    int success_count
+    int failure_count
+    int pending_count
+  }
+  opentaxii_job_detail {
+    uuid id PK
+    uuid job_id FK
+    string stix_id
+    datetime version
+    text message
+    enum status
+  }

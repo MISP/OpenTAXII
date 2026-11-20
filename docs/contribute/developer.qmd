@@ -1,5 +1,8 @@
 ---
 title: "Contributing and developing"
+format:
+  html:
+    lightbox: true
 ---
 
 ## Reporting issues
@@ -22,7 +25,37 @@ OpenTAXII repository has the following layout:
 
 ## Database schema
 
-![image](../db_schema_diagram.png){width="1000px"}
+The built-in SQL backends define separate schemas for TAXII 2.1, TAXII 1.x, and accounts. The diagrams show selected columns and database foreign keys. A circle at the parent end indicates that the foreign key can be null. `PK`, `FK`, and `UK` mark primary, foreign, and unique keys.
+
+### TAXII 2.1
+
+API roots organize collections and track object submissions. A collection can store multiple versions of the same STIX object. The database enforces uniqueness for `(collection_id, id, version)` on STIX objects and `(api_root_id, alias)` on collections. Job details record submission results by STIX ID and version.
+
+![TAXII 2.1 tables for API roots, collections, STIX objects, submission jobs, and per-object job results.](../assets/diagrams/taxii2-schema.svg){fig-alt="A TAXII 2.1 entity-relationship diagram. API roots link to collections and jobs. Collections link to stored STIX objects, and jobs link to job details."}
+
+### TAXII 1.x
+
+Join tables associate services with collections and collections with content blocks. Inbox messages may supply content blocks, and collections are referenced by poll result sets and subscriptions.
+
+![TAXII 1.x tables for services, inbox messages, content blocks, collections, poll result sets, and subscriptions.](../assets/diagrams/taxii1-schema.svg){fig-alt="A TAXII 1.x entity-relationship diagram with two join tables. Services and content blocks link to data collections through their respective join tables."}
+
+### Accounts
+
+The SQL authentication backend stores permissions as JSON in the `_permissions` column. OpenTAXII checks collection access using the collection name for TAXII 1.x and the collection ID for TAXII 2.1.
+
+![The accounts table stores usernames, password hashes, administrator flags, and permissions.](../assets/diagrams/accounts-schema.svg){fig-alt="The standalone accounts table has a primary key on id and a unique key on username."}
+
+### Updating the diagrams
+
+Edit the Mermaid sources in `docs/assets/diagrams/` and regenerate the SVGs with Quarto 1.9.38, Python Playwright, and Chromium installed. Commit the sources and SVGs together so the HTML, PDF, and EPUB builds can use the artwork directly. [MISP book diagram template](https://github.com/MISP/misp-book/tree/68e2dfc4893db0143bd91a8fb6ff2d6a52f65f18/assets/diagrams)
+
+``` sh
+uv run --with playwright --no-project python docs/update_db_schema_diagram.py \
+  --mermaid-js /path/to/quarto/share/formats/html/mermaid/mermaid.min.js \
+  --chromium /usr/bin/chromium
+```
+
+The embedded MISP logo is by the MISP contributors and is licensed under CC BY 4.0. [Logo and attribution](https://github.com/MISP/MISP/blob/99ebee729702c560528f9788953719bda68aa1c1/INSTALL/logos/README.md)
 
 ## Set up a development environment
 
