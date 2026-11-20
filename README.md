@@ -28,20 +28,21 @@ OpenTAXII can also be run using docker. This guide assumes that you have
 access to a local or remote docker server, and won't go into the setup
 of docker.
 
-To get a default (development) instance using docker
+From the root of this repository, build and run a development image.
 
 ```bash
-$ docker run -d -p 9000:9000 eclecticiq/opentaxii
+docker build -t opentaxii:local .
+docker run --pull=never -d -p 9000:9000 opentaxii:local
 ```
 
-To have the instance preloaded with example data, see [the documentation on docker volumes](https://opentaxii.readthedocs.io/en/stable/docker.html#volumes).
+To preload the instance with example data, see the [Docker volume documentation](docs/installation/docker.rst#volumes).
 
 > **NOTE:**
 > OpenTAXII is now accessible through port 9000, with data stored
 > locally in a SQLite databases optionally using services/collections/accounts defined
-> in [data-configuration.yml](https://raw.githubusercontent.com/EclecticIQ/OpenTAXII/master/examples/data-configuration.yml)
+> in [data-configuration.yml](examples/data-configuration.yml).
 
-More documentation on running OpenTAXII in a container is found in the [OpenTAXII Docker Documentation](https://opentaxii.readthedocs.io/en/stable/docker.html).
+See the [Docker guide](docs/installation/docker.rst) for configuration and Compose examples.
 
 ## Feedback
 
