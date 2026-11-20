@@ -3,10 +3,10 @@ import datetime
 import pytest
 
 from opentaxii.taxii2.utils import taxii2_datetimeformat
+from tests.taxii2 import utils
 from tests.taxii2.factories import STIXObjectFactory
-from tests.taxii2.utils import COLLECTIONS
 
-COLLECTION = COLLECTIONS[6]
+COLLECTION = utils.COLLECTIONS[6]
 DATE_ADDED = datetime.datetime(2024, 1, 3, tzinfo=datetime.timezone.utc)
 OBJECT_ID = "identity--00000000-0000-4000-8000-000000000001"
 SECOND_OBJECT_ID = "identity--00000000-0000-4000-8000-000000000002"
@@ -37,17 +37,28 @@ ENDPOINTS = [
 ]
 
 
+@pytest.fixture(params=["sql", "mock"])
+def pagination_objects(request, db_stix_objects, taxii2_sqldb_api, monkeypatch):
+    if request.param == "mock":
+        monkeypatch.setattr(utils, "STIX_OBJECTS", tuple(db_stix_objects))
+        monkeypatch.setattr(taxii2_sqldb_api, "get_object", utils.GET_OBJECT_MOCK)
+        monkeypatch.setattr(taxii2_sqldb_api, "get_objects", utils.GET_OBJECTS_MOCK)
+        monkeypatch.setattr(taxii2_sqldb_api, "get_manifest", utils.GET_MANIFEST_MOCK)
+        monkeypatch.setattr(taxii2_sqldb_api, "get_versions", utils.GET_VERSIONS_MOCK)
+    return db_stix_objects
+
+
 @pytest.mark.parametrize("db_stix_objects", [TIED_OBJECTS], indirect=True)
 @pytest.mark.parametrize("endpoint, version_field, record_count", ENDPOINTS)
 def test_pagination_with_tied_dates(
-    authenticated_client, db_stix_objects, endpoint, version_field, record_count
+    authenticated_client, pagination_objects, endpoint, version_field, record_count
 ):
     url = f"/taxii2/{COLLECTION.api_root_id}/collections/{COLLECTION.id}/{endpoint}"
     headers = {"Accept": "application/taxii+json;version=2.1"}
     filters: dict[str, int | str] = {"limit": 1}
     if version_field is not None:
         filters["match[version]"] = "all"
-    expected = sorted(db_stix_objects, key=lambda obj: (obj.id, obj.version))[
+    expected = sorted(pagination_objects, key=lambda obj: (obj.id, obj.version))[
         :record_count
     ]
 
