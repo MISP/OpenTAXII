@@ -1,0 +1,26 @@
+---
+title: "Introduction"
+format:
+  html:
+    body-classes: guide-home
+---
+
+::: {.guide-lead}
+OpenTAXII is a Python implementation of TAXII for sharing cyber threat intelligence.
+:::
+
+TAXII (Trusted Automated eXchange of Indicator Information) defines services and message exchanges for sharing threat intelligence between organizations. OpenTAXII implements TAXII 1.0 and 1.1 services and provides TAXII 2.1 endpoints for exchanging STIX content.
+
+::: {.content-visible when-format="html"}
+::: {.guide-links}
+[**Install OpenTAXII** Set up a Python environment or build a Docker image.](installation/index.qmd){.guide-link}
+
+[**Manage OpenTAXII** Create collections, manage accounts, and send requests.](usage/index.qmd){.guide-link}
+
+[**Develop and extend** Set up a checkout and explore the Python APIs.](contribute/index.qmd){.guide-link}
+:::
+:::
+
+The Flask transport layer, TAXII handlers, persistence API, and authentication API are separate components. The server supports custom authentication and persistence implementations, signal listeners, and configurable logging.
+
+See the [changelog](references/changes.qmd) for release history and [PyPI](https://pypi.org/project/opentaxii/) for published packages.

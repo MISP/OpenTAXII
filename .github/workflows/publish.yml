@@ -38,7 +38,7 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         artifacts: "dist/opentaxii*.whl,dist/opentaxii*.tar.gz"
-        bodyFile: "CHANGES.rst"
+        bodyFile: "CHANGES.md"
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish distribution to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1

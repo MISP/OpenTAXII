@@ -1,0 +1,64 @@
+---
+title: "Contributing and developing"
+---
+
+## Reporting issues
+
+OpenTAXII uses Github's issue tracker. See the [OpenTAXII project page](https://github.com/MISP/OpenTAXII) on Github.
+
+## Obtaining the source code
+
+The OpenTAXII source code can be found on Github. See the [OpenTAXII project page](https://github.com/MISP/OpenTAXII).
+
+## Layout
+
+OpenTAXII repository has the following layout:
+
+-   `docker/` - Docker configuration files ([OpenTAXII Docker documentation](../installation/docker.qmd));
+-   `docs/` - used to build the [documentation](https://misp.github.io/OpenTAXII/);
+-   `examples/` - configuration and code examples;
+-   `opentaxii/` - OpenTAXII source;
+-   `tests/` - opentaxii tests.
+
+## Database schema
+
+![image](../db_schema_diagram.png){width="1000px"}
+
+## Set up a development environment
+
+Install uv as described in the [installation guide](../installation/installation.qmd#install-with-uv). From the repository root, create a virtual environment and install an editable copy of OpenTAXII with its development dependencies.
+
+``` sh
+uv venv --python 3.11
+uv pip install -r requirements-dev.txt -e .
+```
+
+OpenTAXII's package metadata lives in `setup.py`. Use `uv run --no-project` to run commands in `.venv` with the installed package.
+
+## Running the tests
+
+Run the test suite from the repository root. It uses temporary SQLite databases by default.
+
+``` sh
+uv run --no-project python -m pytest
+```
+
+The CI matrix in `tox.ini` also tests against MySQL, MariaDB, and PostgreSQL.
+
+## Generating the documentation
+
+The documentation is written in Quarto Markdown and built with [Quarto](https://quarto.org/). From the repository root, install the documentation dependencies and render the book.
+
+``` sh
+uv pip install -r docs/requirements.txt
+uv run --no-project python docs/render-references.py
+quarto render docs
+```
+
+Quarto writes the HTML, PDF, and EPUB to `docs/_book/`. Run `quarto preview docs` for a local preview.
+
+GitHub Actions builds the book for pull requests and publishes it to [GitHub Pages](https://misp.github.io/OpenTAXII/) from `master`.
+
+### Next steps
+
+Continue to [License](../license.qmd).

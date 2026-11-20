@@ -1,0 +1,13 @@
+---
+title: "Running Development OpenTAXII"
+---
+
+Here we describe how to run OpenTAXII in a *development*. Development mode activates [Flask](http://flask.pocoo.org/) debug mode, simplifies log messages (for humans) and runs the server in one thread. While in production mode there are no debug messages, proper json log messages and multithreaded if configured.
+
+From the repository root, run the development server in the environment created by the [development setup](developer.qmd).
+
+``` sh
+uv run --no-project opentaxii-run-dev
+```
+
+OpenTAXII listens on `localhost:9000`.

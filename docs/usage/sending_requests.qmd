@@ -1,22 +1,20 @@
-============================
-Sending requests to services
-============================
+---
+title: "Sending requests to services"
+---
 
-TAXII 1
-=======
+## TAXII 1
 
-The easiest way to send requests to TAXII services is to use `Cabby library <http://github.com/eclecticiq/cabby>`_ CLI tools::
+The easiest way to send requests to TAXII services is to use [Cabby library](http://github.com/eclecticiq/cabby) CLI tools:
 
     (venv) $ pip install cabby
 
-If you are running OpenTAXII in default configuration and you created services using :doc:`provided examples <../installation/configuration>`, you should
-be able to communicate with the services.
+If you are running OpenTAXII in default configuration and you created services using [provided examples](../installation/configuration.qmd), you should be able to communicate with the services.
 
-Assuming OpenTAXII is running on ``http://localhost:9000``, to get the list of advertised services, run::
+Assuming OpenTAXII is running on `http://localhost:9000`, to get the list of advertised services, run:
 
     (venv) $ taxii-discovery --path http://localhost:9000/services/discovery-a
 
-You should see the following output::
+You should see the following output:
 
     2018-06-03 21:26:32,188 INFO: Sending Discovery_Request to http://localhost:9000/services/discovery-a
     2018-06-03 21:26:32,207 INFO: 7 services discovered
@@ -54,11 +52,11 @@ You should see the following output::
 
     ..... snip .....
 
-One of the configured services is a Collection Management Service. To get the collections list, run::
+One of the configured services is a Collection Management Service. To get the collections list, run:
 
     (venv) $ taxii-collections --path http://localhost:9000/services/collection-management-a
 
-You should see the following output::
+You should see the following output:
 
     2018-06-03 21:30:03,315 INFO: Sending Collection_Information_Request to http://localhost:9000/services/collection-management-a
     === Data Collection Information ===
@@ -129,36 +127,30 @@ You should see the following output::
 
     .... snip .....
 
+See [Cabby documentation](http://cabby.readthedocs.org) for more examples.
 
-See `Cabby documentation <http://cabby.readthedocs.org>`_ for more examples.
+## TAXII 2
 
-TAXII 2
-=======
+### HTTP
 
-HTTP
-----
+You can make HTTP requests directly to the server. The discovery endpoint is at `/taxii2/`. The trailing `/` is important.
 
-You can make HTTP requests directly to the server. The discovery endpoint is at
-``/taxii2/``. The trailing ``/`` is important.
+Then, the other endpoints are the ones provided by the [TAXII 2.1 specs](https://docs.oasis-open.org/cti/taxii/v2.1/csprd02/taxii-v2.1-csprd02.html#_Toc16526015).
 
-Then, the other endpoints are the ones provided by the `TAXII 2.1 specs
-<https://docs.oasis-open.org/cti/taxii/v2.1/csprd02/taxii-v2.1-csprd02.html#_Toc16526015>`_. 
+### Python
 
-Python
-------
+``` python
+import taxii2client
 
-.. code-block:: python
+# With public discovery
+server = taxii2client.Server(url="http://localhost:9000/taxii2/")
 
-  import taxii2client
+print(server.title)
+for root in server.api_roots:
+    print(root.url)
 
-  # With public discovery
-  server = taxii2client.Server(url="http://localhost:9000/taxii2/")
-
-  print(server.title)
-  for root in server.api_roots:
-      print(root.url)
-
-  # With authentication
-  api_root = taxii2client.ApiRoot(
-    root.url, user="<username>", password="<password>"
-  )
+# With authentication
+api_root = taxii2client.ApiRoot(
+  root.url, user="<username>", password="<password>"
+)
+```

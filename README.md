@@ -8,19 +8,20 @@ designed application.
 
 OpenTAXII is guaranteed to be compatible with [Cabby](https://github.com/eclecticiq/cabby), TAXII client library.
 
-[Source](https://github.com/eclecticiq/OpenTAXII) | [Documentation](http://opentaxii.readthedocs.org) | [Information](http://www.eclecticiq.com) | [Download](https://pypi.python.org/pypi/opentaxii/)
+[Source](https://github.com/eclecticiq/OpenTAXII) | [Documentation](https://misp.github.io/OpenTAXII/) | [Information](http://www.eclecticiq.com) | [Download](https://pypi.python.org/pypi/opentaxii/)
 
 
 [![Build status](https://github.com/eclecticiq/OpenTAXII/actions/workflows/tox.yml/badge.svg?branch=master)](https://github.com/eclecticiq/OpenTAXII/actions/workflows/tox.yml?query=branch%3Amaster+)
 [![Coverage Status](https://coveralls.io/repos/eclecticiq/OpenTAXII/badge.svg)](https://coveralls.io/r/eclecticiq/OpenTAXII)
-[![Documentation Status](https://readthedocs.org/projects/opentaxii/badge/?version=stable)](https://readthedocs.org/projects/opentaxii/)
+[![Documentation](https://github.com/MISP/OpenTAXII/actions/workflows/quarto.yml/badge.svg?branch=master)](https://misp.github.io/OpenTAXII/)
 
 ## State of the project
 
 We have made the decision to consider this project **feature-complete**. It means we still maintain it, however we focus only on bug fixes. Still, we’re very open to external contributions - if you know how to fix an issue and you can open a PR, we will be very grateful.
 
 ## Getting started
-See [the documentation](https://opentaxii.readthedocs.io/en/stable/installation.html).
+
+See how to install OpenTAXII from PyPI or a source checkout and start the development server. [Install with `uv`](https://misp.github.io/OpenTAXII/installation/installation.html#install-with-uv)
 
 ## Getting started with OpenTAXII using Docker
 
@@ -35,14 +36,14 @@ docker build -t opentaxii:local .
 docker run --pull=never -d -p 9000:9000 opentaxii:local
 ```
 
-To preload the instance with example data, see the [Docker volume documentation](docs/installation/docker.rst#volumes).
+To preload the instance with example data, see the [Docker volume documentation](https://misp.github.io/OpenTAXII/installation/docker.html#volumes).
 
 > **NOTE:**
 > OpenTAXII is now accessible through port 9000, with data stored
 > locally in a SQLite databases optionally using services/collections/accounts defined
 > in [data-configuration.yml](examples/data-configuration.yml).
 
-See the [Docker guide](docs/installation/docker.rst) for configuration and Compose examples.
+See the [Docker guide](https://misp.github.io/OpenTAXII/installation/docker.html) for configuration and Compose examples.
 
 ## Feedback
 

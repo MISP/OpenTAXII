@@ -1,0 +1,14 @@
+---
+title: "Health check"
+---
+
+OpenTAXII has an endpoint that can be used to check health of the service:
+
+    $ curl http://localhost:9000/management/health
+    {
+      "alive": true
+    }
+
+## Next steps
+
+Continue to [Authentication](auth.qmd) page to learn how OpenTAXII authentication process works.

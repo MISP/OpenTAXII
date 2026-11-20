@@ -1,0 +1,10 @@
+---
+title: "Manage OpenTAXII"
+---
+
+-   [Accounts](accounts.qmd)
+-   [TAXII 1: Services and Collections](taxii1_services_collections.qmd)
+-   [TAXII 2: API Root and collections](taxii2_apiroot_collections.qmd)
+-   [Authentication and authorization](auth.qmd)
+-   [Sending requests to services](sending_requests.qmd)
+-   [Health check](health_check.qmd)

@@ -1,0 +1,7 @@
+---
+title: "API reference"
+---
+
+This reference documents the Python classes, methods, functions, and attributes used by OpenTAXII. For protocol terminology, see the [TAXII project](https://taxiiproject.github.io/) and the [TAXII 2.1 specification](https://docs.oasis-open.org/cti/taxii/v2.1/os/taxii-v2.1-os.html).
+
+{{< include ../_generated/python-api.qmd >}}

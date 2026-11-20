@@ -1,0 +1,5 @@
+---
+title: "Changelog"
+---
+
+{{< include ../_generated/changes.md >}}
