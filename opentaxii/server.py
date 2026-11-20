@@ -45,7 +45,7 @@ from .entities import Account
 from .exceptions import UnauthorizedException
 from .local import context
 from .persistence import Taxii1PersistenceManager, Taxii2PersistenceManager
-from .taxii2.http import make_taxii2_response
+from .taxii2.http import accepts_media_type, make_taxii2_response, matches_content_type
 from .taxii.bindings import ALL_PROTOCOL_BINDINGS, MESSAGE_BINDINGS, SERVICE_BINDINGS
 from .taxii.exceptions import FailureStatus, StatusMessageException, raise_failure
 from .taxii.http import (
@@ -506,15 +506,13 @@ class TAXII2Server(BaseTAXIIServer):
 
     def check_headers(self, endpoint: Endpoint):
         if not any(
-            [
-                accept_mimetype in request.accept_mimetypes
-                for accept_mimetype in endpoint.func.registered_valid_accept_mimetypes
-            ]
+            accepts_media_type(request.accept_mimetypes, supported)
+            for supported in endpoint.func.registered_valid_accept_mimetypes
         ):
             raise NotAcceptable()
-        if (
-            request.method == "POST"
-            and request.content_type not in endpoint.func.registered_valid_content_types
+        if request.method == "POST" and not any(
+            matches_content_type(request.content_type, supported)
+            for supported in endpoint.func.registered_valid_content_types
         ):
             raise UnsupportedMediaType()
 
