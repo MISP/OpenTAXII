@@ -45,6 +45,16 @@ uv run --no-project python -m pytest
 
 The CI matrix in `tox.ini` also tests against MySQL, MariaDB, and PostgreSQL.
 
+### MISP feed round trip
+
+This test converts two saved MISP events to STIX 2.1 with `misp-stix`. It uses Cabby to upload them over HTTPS to a local OpenTAXII server, then checks the submission status and compares all objects retrieved across multiple pages with the converted bundle. [CIRCL OSINT feed](https://www.circl.lu/doc/misp/feed-osint/)
+
+``` sh
+uvx --python 3.12 tox -e py312-feed-round-trip
+```
+
+GitHub Actions runs this test with a temporary SQLite database.
+
 ## Generating the documentation
 
 The documentation is written in Quarto Markdown and built with [Quarto](https://quarto.org/). From the repository root, install the documentation dependencies and render the book.

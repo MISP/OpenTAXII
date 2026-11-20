@@ -68,3 +68,16 @@ jobs:
         done
     - name: Test with tox
       run: tox --recreate
+
+  feed-round-trip:
+    name: MISP feed round trip
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install tox
+      run: python -m pip install tox
+    - name: Convert, upload, and retrieve the feed
+      run: tox -e py312-feed-round-trip
