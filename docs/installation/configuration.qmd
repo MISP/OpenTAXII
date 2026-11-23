@@ -92,7 +92,7 @@ taxii1:
 >     -   `save_raw_inbox_message` --- enable/disable storing of raw TAXII Inbox messages via Persistence API's `create_inbox_message` method. This is useful for bookkeeping but significantly increases storage requirements.
 >     -   `xml_parser_supports_huge_tree` --- enable/disable security restrictions in [lxml](http://lxml.de/) library to allow support for very deep trees and very long text content. If this is disabled, OpenTAXII will not be able to parse TAXII messages with content blocks larger than roughly 10MB.
 >     -   `count_blocks_in_poll_responses` --- enable/disable total count in TAXII Poll responses. It is disabled by default since `count` operation might be [very slow](https://wiki.postgresql.org/wiki/Slow_Counting) in some SQL DBs.
->     -   `unauthorized_status` --- TAXII status type for authorization error. \"UNAUTHORIZED\" by default. see [libtaxii.constants.ST_TYPES_11](https://libtaxii.readthedocs.io/en/stable/api/constants.html#libtaxii.constants.ST_TYPES_11) for the list of available values.
+>     -   `unauthorized_status` --- TAXII status type for authorization error. \"UNAUTHORIZED\" by default. Available values are listed in the MISP libtaxii documentation. [libtaxii.constants.ST_TYPES_11](https://misp.github.io/libtaxii/api/constants.html#libtaxii.constants.ST_TYPES_11)
 >     -   `hooks` - custom python module with signal subscriptions to import. See [documentation on custom signals](../references/public_apis.qmd#custom-signals) and [an example](https://github.com/MISP/OpenTAXII/blob/master/examples/hooks.py).
 >     -   `persistence_api` --- configuration properties for Persistence API implementation.
 >         -   `class` --- the full import name of the class to use

@@ -29,7 +29,7 @@ A server will reply with a JSON dictionary that contains a token. For example:
       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50X2lkIjoxLCJleHAiOjE0Mjc2MzgyMjN9.oKd43j4KR1Ovu8zOtwFdeaKILys_kpl3fAiECclP7_4"
     }
 
-To query a service with authentication enabled, pass the token in a value of `Authorization` HTTP header. Example request using [Cabby library](http://github.com/eclecticiq/cabby) CLI command:
+To query a service with authentication enabled, pass the token in the `Authorization` HTTP header. These examples use the `taxii-poll` command from `misp-cabby`. [misp-cabby on PyPI](https://pypi.org/project/misp-cabby/)
 
     # using raw HTTP header
     (venv) $ taxii-poll \

@@ -4,9 +4,9 @@ title: "Sending requests to services"
 
 ## TAXII 1
 
-The easiest way to send requests to TAXII services is to use [Cabby library](http://github.com/eclecticiq/cabby) CLI tools:
+Install `misp-cabby` in a fresh virtual environment with Python 3.11 or 3.12 to use its TAXII CLI tools. [misp-cabby on PyPI](https://pypi.org/project/misp-cabby/)
 
-    (venv) $ pip install cabby
+    (venv) $ python -m pip install misp-cabby
 
 If you are running OpenTAXII in default configuration and you created services using [provided examples](../installation/configuration.qmd), you should be able to communicate with the services.
 
@@ -127,7 +127,7 @@ You should see the following output:
 
     .... snip .....
 
-See [Cabby documentation](http://cabby.readthedocs.org) for more examples.
+See the [MISP Cabby documentation](https://misp.github.io/cabby/) for more examples.
 
 ## TAXII 2
 

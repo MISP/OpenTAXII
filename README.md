@@ -6,7 +6,7 @@ OpenTAXII is a robust Python implementation of TAXII Services that
 delivers rich feature set and friendly pythonic API built on top of well
 designed application.
 
-OpenTAXII is guaranteed to be compatible with [Cabby](https://github.com/eclecticiq/cabby), TAXII client library.
+OpenTAXII tests interoperability with the MISP Project’s TAXII client. [misp-cabby on PyPI](https://pypi.org/project/misp-cabby/)
 
 [MISP fork](https://github.com/MISP/OpenTAXII) | [EclecticIQ upstream](https://github.com/eclecticiq/OpenTAXII) | [Documentation](https://misp.github.io/OpenTAXII/) | [Download](https://pypi.org/project/opentaxii/)
 

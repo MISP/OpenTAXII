@@ -80,7 +80,7 @@ The CI matrix in `tox.ini` also tests against MySQL, MariaDB, and PostgreSQL.
 
 ### MISP feed round trip
 
-This test converts two saved MISP events to STIX 2.1 with `misp-stix`. It uses Cabby to upload them over HTTPS to a local OpenTAXII server, then checks the submission status and compares all objects retrieved across multiple pages with the converted bundle. [CIRCL OSINT feed](https://www.circl.lu/doc/misp/feed-osint/)
+This test converts two saved MISP events to STIX 2.1 with `misp-stix`. It uses `misp-cabby` to upload them over HTTPS to a local OpenTAXII server, then checks the submission status and compares all objects retrieved across multiple pages with the converted bundle. The client and server use the same `misp-libtaxii` installation. [CIRCL OSINT feed](https://www.circl.lu/doc/misp/feed-osint/)
 
 ``` sh
 uvx --python 3.12 tox -e py312-feed-round-trip
