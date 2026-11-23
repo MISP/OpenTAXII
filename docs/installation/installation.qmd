@@ -4,11 +4,11 @@ title: "Installation"
 
 ## Install with uv {#install-with-uv}
 
-Follow the [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/) to install uv. From the directory where you want to keep the OpenTAXII virtual environment, run the following commands to install the PyPI release and start the development server.
+Follow the [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/) to install uv. From the root of an OpenTAXII source checkout, run the following commands to install OpenTAXII and start the development server.
 
 ``` sh
 uv venv --python 3.11
-uv pip install opentaxii
+uv pip install .
 uv run --no-project opentaxii-run-dev
 ```
 
@@ -18,11 +18,11 @@ uv stores the environment in `.venv` and downloads Python 3.11 if it needs to. T
 curl --fail http://localhost:9000/management/health
 ```
 
-To install the version in a source checkout, run these commands from its root.
+To install the OpenTAXII release from PyPI, run these commands from the directory where you want to keep its virtual environment.
 
 ``` sh
 uv venv --python 3.11
-uv pip install .
+uv pip install opentaxii
 uv run --no-project opentaxii-run-dev
 ```
 
@@ -64,7 +64,7 @@ Without the virtual environment it's just:
 
 ::: {.callout-note}
 
-Since OpenTAXII has [libtaxii](https://github.com/TAXIIProject/libtaxii) as a dependency, the system libraries [libtaxii]{.title-ref} will be installed. Check [libtaxii documentation](http://libtaxii.readthedocs.org/en/latest/installation.html#dependencies) for the details.
+The OpenTAXII 0.9.3 release on PyPI depends on the legacy `libtaxii` distribution. Install from a source checkout to use `misp-libtaxii` before the next release. When upgrading, create a fresh virtual environment because both distributions install the `libtaxii` Python module. [misp-libtaxii on PyPI](https://pypi.org/project/misp-libtaxii/)
 :::
 
 To install OpenTAXII from source with pip, activate the virtual environment and run this command from the root of the checkout or unpacked source archive.

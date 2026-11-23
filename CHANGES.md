@@ -19,6 +19,7 @@ Bug fixes:
 
 Dependencies:
 
+-   Use `misp-libtaxii` for the server and `misp-cabby` for the MISP feed integration test, both from PyPI.
 -   Add Python 3.11 and 3.12 support
 -   Drop EOL Python 3.6, 3.7, 3.8 and 3.9 support
 -   Drop sqlalchemy 1.3 support

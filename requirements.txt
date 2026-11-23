@@ -1,5 +1,5 @@
 pytz>=2017.2
-libtaxii>=1.1.111
+misp-libtaxii>=1.2.0
 lxml>=4.3.1
 pyyaml>=3.11
 flask>=0.10.1
