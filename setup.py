@@ -20,7 +20,7 @@ def get_file_contents(filename):
 install_requires = get_file_contents('requirements.txt').split()
 
 setup(
-    name='opentaxii',
+    name='misp-opentaxii',
     description='TAXII server implementation in Python maintained by the MISP Project',
     long_description=get_file_contents('README.md'),
     long_description_content_type='text/markdown',

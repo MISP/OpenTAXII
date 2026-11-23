@@ -8,7 +8,7 @@ designed application.
 
 OpenTAXII tests interoperability with the MISP Project’s TAXII client. [misp-cabby on PyPI](https://pypi.org/project/misp-cabby/)
 
-[MISP fork](https://github.com/MISP/OpenTAXII) | [EclecticIQ upstream](https://github.com/eclecticiq/OpenTAXII) | [Documentation](https://misp.github.io/OpenTAXII/) | [Download](https://pypi.org/project/opentaxii/)
+[MISP fork](https://github.com/MISP/OpenTAXII) | [EclecticIQ upstream](https://github.com/eclecticiq/OpenTAXII) | [Documentation](https://misp.github.io/OpenTAXII/) | [misp-opentaxii on PyPI](https://pypi.org/project/misp-opentaxii/)
 
 
 [![Build status](https://github.com/MISP/OpenTAXII/actions/workflows/tox.yml/badge.svg?branch=master)](https://github.com/MISP/OpenTAXII/actions/workflows/tox.yml?query=branch%3Amaster)

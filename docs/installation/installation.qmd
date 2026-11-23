@@ -18,11 +18,11 @@ uv stores the environment in `.venv` and downloads Python 3.11 if it needs to. T
 curl --fail http://localhost:9000/management/health
 ```
 
-To install the OpenTAXII release from PyPI, run these commands from the directory where you want to keep its virtual environment.
+Once the first `misp-opentaxii` release is on PyPI, run these commands from the directory where you want to keep its virtual environment.
 
 ``` sh
 uv venv --python 3.11
-uv pip install opentaxii
+uv pip install misp-opentaxii
 uv run --no-project opentaxii-run-dev
 ```
 
@@ -54,17 +54,13 @@ Activate this environment:
     $ . venv/bin/activate
     (venv) $
 
-Now install the latest OpenTAXII release from the [Python Package Index](http://pypi.python.org/) (PyPI) using `pip`:
+Install the published distribution with `pip`. Use the source installation below until the first PyPI release is available. [misp-opentaxii on PyPI](https://pypi.org/project/misp-opentaxii/)
 
-    (venv) $ pip install opentaxii
-
-Without the virtual environment it's just:
-
-    $ pip install opentaxii
+    (venv) $ python -m pip install misp-opentaxii
 
 ::: {.callout-note}
 
-The OpenTAXII 0.9.3 release on PyPI depends on the legacy `libtaxii` distribution. Install from a source checkout to use `misp-libtaxii` before the next release. When upgrading, create a fresh virtual environment because both distributions install the `libtaxii` Python module. [misp-libtaxii on PyPI](https://pypi.org/project/misp-libtaxii/)
+When migrating from the original `opentaxii` distribution, create a fresh virtual environment. Both distributions install the `opentaxii` Python package and the `opentaxii-*` commands, and their respective TAXII 1.x dependencies share the `libtaxii` import name.
 :::
 
 To install OpenTAXII from source with pip, activate the virtual environment and run this command from the root of the checkout or unpacked source archive.
