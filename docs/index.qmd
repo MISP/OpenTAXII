@@ -25,4 +25,4 @@ TAXII (Trusted Automated eXchange of Indicator Information) defines services and
 
 The Flask transport layer, TAXII handlers, persistence API, and authentication API are separate components. The server supports custom authentication and persistence implementations, signal listeners, and configurable logging.
 
-See the [changelog](references/changes.qmd) for release history and [PyPI](https://pypi.org/project/opentaxii/) for published packages.
+See the [changelog](references/changes.qmd) for release history. The MISP Project publishes OpenTAXII as `misp-opentaxii`. [misp-opentaxii on PyPI](https://pypi.org/project/misp-opentaxii/)
